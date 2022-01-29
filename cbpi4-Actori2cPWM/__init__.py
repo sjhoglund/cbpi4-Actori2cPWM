@@ -33,7 +33,6 @@ class i2cPWMActor(CBPiActor):
         pass
     
     def init(self):
-        self.mh = Adafruit_MotorHAT(addr=0x60, freq=int(self.frequency))
         if self.elementNumber == 1:
             self.motor = kit.motor1
         elif self.elementNumber == 2:
