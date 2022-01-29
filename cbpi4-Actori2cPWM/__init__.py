@@ -26,6 +26,9 @@ class i2cPWMActor(CBPiActor):
     
     # Initiate kit object
     kit = MotorKit(i2c=board.I2C())
+    
+    def __init__(self, cbpi, id, props):
+        super(i2cPWMActor, self).__init__(cbpi, id, props)
 
     @action("action", parameters={})
     async def action(self, **kwargs):
