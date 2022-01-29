@@ -18,7 +18,6 @@ setup(name='cbpi4-Actori2cPWM',
       '': ['*.txt', '*.rst', '*.yaml'],
       'cbpi4-Actori2cPWM': ['*','*.txt', '*.rst', '*.yaml']},
       packages=['cbpi4-Actori2cPWM'],
-      ,
       install_requires=[
           'cbpi>=4.0.0.33',
           'adafruit-circuitpython-motorkit'
