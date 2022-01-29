@@ -7,44 +7,25 @@ from unittest.mock import MagicMock, patch
 import asyncio
 import random
 from cbpi.api import *
+from cbpi.api.dataclasses import NotificationAction, NotificationType
+
+##### Actor requirements #####
+import time
+import board
+from adafruit_motorkit import MotorKit
+###############################
 
 logger = logging.getLogger(__name__)
 
 
-class CustomWebExtension(CBPiExtension):
-
-    @request_mapping(path="/", auth_required=False)
-    async def hello_world(self, request):
-        return web.HTTPFound('static/index.html')
-
-    def __init__(self, cbpi):
-        self.cbpi = cbpi
-        path = os.path.dirname(__file__)
-        self.cbpi.register(self, "/cbpi_uiplugin", static=os.path.join(path, "static"))
-
-
-@parameters([])
-class CustomSensor(CBPiSensor):
+@parameters([
+    Property.Select(label="elementNumber", options=[1,2,3,4], description="number between 1 and 4"),
+    Property.Number(label="frequency", configurable=True)
+])
+class i2cPWMActor(CBPiActor):
     
-    def __init__(self, cbpi, id, props):
-        super(CustomSensor, self).__init__(cbpi, id, props)
-        self.value = 0
-
-    @action(key="Test", parameters=[])
-    async def action1(self, **kwargs):
-        print("ACTION!", kwargs)
-
-    async def run(self):
-        while self.running is True:
-            self.value = random.randint(0,50)
-            self.push_update(self.value)
-            await asyncio.sleep(1)
-    
-    def get_state(self):
-        return dict(value=self.value)
-
-@parameters([])
-class CustomActor(CBPiActor):
+    # Initiate kit object
+    kit = MotorKit(i2c=board.I2C())
 
     @action("action", parameters={})
     async def action(self, **kwargs):
@@ -52,14 +33,24 @@ class CustomActor(CBPiActor):
         pass
     
     def init(self):
+        self.mh = Adafruit_MotorHAT(addr=0x60, freq=int(self.frequency))
+        if self.elementNumber == 1:
+            self.motor = kit.motor1
+        elif self.elementNumber == 2:
+            self.motor = kit.motor2
+        elif self.elementNumber == 3:
+            self.motor = kit.motor3
+        elif self.elementNumber == 4:
+            self.motor = kit.motor4 
         self.state = False
         pass
 
     async def on(self, power=0):
-        logger.info("ACTOR 1111 %s ON" % self.id)
+        self.motor.throttle = power * 0.01
         self.state = True
 
     async def off(self):
+        self.motor.throttle = 0
         logger.info("ACTOR %s OFF " % self.id)
         self.state = False
 
@@ -71,7 +62,5 @@ class CustomActor(CBPiActor):
 
 
 def setup(cbpi):
-    #cbpi.plugin.register("MyCustomActor", CustomActor)
-    #cbpi.plugin.register("MyCustomSensor", CustomSensor)
-    #cbpi.plugin.register("MyustomWebExtension", CustomWebExtension)
+    cbpi.plugin.register("cbpi4-Actori2cPWM", i2cPWMActor)
     pass
