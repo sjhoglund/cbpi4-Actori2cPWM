@@ -4,10 +4,10 @@
 Plugin will provide the ability to run actors using Adafruit's DC & Stepper Motor HAT for Raspberry Pi. Reason for using this HAT is to take advantage of a the fully-dedicated PWM driver chip. The PWM control is amazing!
 
 ## Installation: ##
+First two steps can be combined.
 * install i2c support:
     * sudo raspi-config
     * Interface Options
-    * Advanced Options
     * I2C
     * Enable by selecting <Yes>
     * sudo reboot
@@ -15,7 +15,6 @@ Plugin will provide the ability to run actors using Adafruit's DC & Stepper Moto
         * sudo i2cdetect -y 1
 * configure SPI:
     * sudo raspi-config
-    * Interface Options
     * SPI
     * Enable by selecting <Yes>
     * sudo reboot
