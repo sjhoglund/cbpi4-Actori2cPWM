@@ -27,7 +27,7 @@ class i2cPWMActor(CBPiActor):
     def __init__(self, cbpi, id, props):
         super(i2cPWMActor, self).__init__(cbpi, id, props)
         
-        self.kit = MotorKit(i2c=board.I2C())
+        kit = MotorKit(i2c=board.I2C())
         self.elementNumber = int(self.props.get("elementNumber", 1))
         
         if self.elementNumber == 1:
