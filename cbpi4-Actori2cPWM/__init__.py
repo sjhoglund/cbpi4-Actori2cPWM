@@ -24,33 +24,37 @@ logger = logging.getLogger(__name__)
 ])
 class i2cPWMActor(CBPiActor):
     
+    # create a default object, no changes to I2C address or frequency
+    kit = MotorKit(i2c=board.I2C())
+    
     def __init__(self, cbpi, id, props):
         super(i2cPWMActor, self).__init__(cbpi, id, props)
-        
-        kit = MotorKit(i2c=board.I2C())
         self.elementNumber = int(self.props.get("elementNumber", 1))
-        
-        if self.elementNumber == 1:
-            self.motor = kit.motor1
-        elif self.elementNumber == 2:
-            self.motor = kit.motor2
-        elif self.elementNumber == 3:
-            self.motor = kit.motor3
-        elif self.elementNumber == 4:
-            self.motor = kit.motor4 
         self.state = False
 
     async def on(self, power=0):
         self.power = int(power)
-        self.motor.throttle = self.power * 0.01
+        if self.elementNumber == 1:
+            kit.motor1.throttle = self.power * 0.01
+        elif self.elementNumber == 2:
+            kit.motor2.throttle = self.power * 0.01
+        elif self.elementNumber == 3:
+            kit.motor3.throttle = self.power * 0.01
+        elif self.elementNumber == 4:
+            kit.motor4.throttle = self.power * 0.01
         self.state = True
-        self.push_update()
 
     async def off(self):
-        self.motor.throttle = 0
+        if self.elementNumber == 1:
+            kit.motor1.throttle = 0
+        elif self.elementNumber == 2:
+            kit.motor2.throttle = 0
+        elif self.elementNumber == 3:
+            kit.motor3.throttle = 0
+        elif self.elementNumber == 4:
+            kit.motor4.throttle = 0
         logger.info("ACTOR %s OFF " % self.id)
         self.state = False
-        self.push_update()
 
     def get_state(self):
         return self.state
