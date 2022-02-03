@@ -23,44 +23,43 @@ logger = logging.getLogger(__name__)
     Property.Number(label="frequency", configurable=True)
 ])
 class i2cPWMActor(CBPiActor):
-    
-    # Initiate kit object
-    kit = MotorKit(i2c=board.I2C())
-    
-    def __init__(self, cbpi, id, props):
-        super(i2cPWMActor                                                                                                                                                             , self).__init__(cbpi, id, props)
 
-    @action("action", parameters={})
-    async def action(self, **kwargs):
-        print("Action Triggered", kwargs)
-        pass
-    
-    def init(self):
-        if self.elementNumber == 1:
-            self.motor = kit.motor1
-        elif self.elementNumber == 2:
-            self.motor = kit.motor2
-        elif self.elementNumber == 3:
-            self.motor = kit.motor3
-        elif self.elementNumber == 4:
-            self.motor = kit.motor4 
+    def on_start(self):
+        self.power = 100
+        self.state = False
+        # Initiate kit object
+        self.kit = MotorKit(i2c=board.I2C())
+        
+        if self.props.get("elementNumber", 1) == 1:
+            self.motor = self.kit.motor1
+        elif self.props.get("elementNumber", 1) == 2:
+            self.motor = self.kit.motor2
+        elif self.props.get("elementNumber", 1) == 3:
+            self.motor = self.kit.motor3
+        elif self.props.get("elementNumber", 1) == 4:
+            self.motor = self.kit.motor4 
         self.state = False
         pass
 
-    async def on(self, power=0):
+    async def on(self, power=None):
+        if power is not None:
+            self.power = int(power)
         self.motor.throttle = power * 0.01
         self.state = True
+        await self.cbpi.actor.actor_update(self.id,self.power)
 
     async def off(self):
         self.motor.throttle = 0
         logger.info("ACTOR %s OFF " % self.id)
         self.state = False
+        await self.cbpi.actor.actor_update(self.id,0)
 
     def get_state(self):
         return self.state
     
     async def run(self):
-        pass
+        while self.running == True:
+            await asyncio.sleep(1)
 
 
 def setup(cbpi):
