@@ -61,5 +61,5 @@ class i2cPWMActor(CBPiActor):
 
 
 def setup(cbpi):
-    cbpi.plugin.register("i2cPWM", i2cPWMActor)
+    cbpi.plugin.register("cbpi4-Actori2cPWM", i2cPWMActor)
     pass
