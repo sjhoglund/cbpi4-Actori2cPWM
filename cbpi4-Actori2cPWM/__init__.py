@@ -24,24 +24,25 @@ logger = logging.getLogger(__name__)
 ])
 class i2cPWMActor(CBPiActor):
 
-    def on_start(self):
+    def __init__(self, cbpi, id, props):
+        super().__init__(cbpi, id, props)
+
         self.power = 100
         self.state = False
-        try:
-            # Initiate kit object
-            self.kit = MotorKit(i2c=board.I2C())
+        
+        # Initiate kit object
+        self.kit = MotorKit(i2c=board.I2C())
+        
+        if self.props.get("elementNumber", 1) == 1:
+            self.motor = self.kit.motor1
+        elif self.props.get("elementNumber", 1) == 2:
+            self.motor = self.kit.motor2
+        elif self.props.get("elementNumber", 1) == 3:
+            self.motor = self.kit.motor3
+        elif self.props.get("elementNumber", 1) == 4:
+            self.motor = self.kit.motor4
             
-            if self.props.get("elementNumber", 1) == 1:
-                self.motor = self.kit.motor1
-            elif self.props.get("elementNumber", 1) == 2:
-                self.motor = self.kit.motor2
-            elif self.props.get("elementNumber", 1) == 3:
-                self.motor = self.kit.motor3
-            elif self.props.get("elementNumber", 1) == 4:
-                self.motor = self.kit.motor4
-        except Exception as e:
-            logger.info("i2cPWM ACTOR %s ERR: %s" % (self.id, e))
-            pass
+        pass
 
     async def on(self, power=None):
         if power is not None:
@@ -62,6 +63,12 @@ class i2cPWMActor(CBPiActor):
     async def run(self):
         while self.running == True:
             await asyncio.sleep(1)
+    
+    async def on_start(self):
+        pass
+
+    async def on_stop(self):
+        pass
 
 
 def setup(cbpi):
