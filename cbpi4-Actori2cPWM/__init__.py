@@ -17,15 +17,15 @@ from adafruit_motorkit import MotorKit
 
 logger = logging.getLogger(__name__)
 
+# create a default object, no changes to I2C address or frequency
+kit = MotorKit(i2c=board.I2C())
+
 
 @parameters([
     Property.Select(label="elementNumber", options=[1,2,3,4], description="number between 1 and 4"),
     Property.Number(label="frequency", configurable=True)
 ])
 class i2cPWMActor(CBPiActor):
-    
-    # create a default object, no changes to I2C address or frequency
-    kit = MotorKit(i2c=board.I2C())
     
     def __init__(self, cbpi, id, props):
         super(i2cPWMActor, self).__init__(cbpi, id, props)
