@@ -44,10 +44,9 @@ class i2cPWMActor(CBPiActor):
             
         pass
 
-    async def on(self, power=None):
-        if power is not None:
-            self.power = int(power)
-        self.motor.throttle = power * 0.01
+    async def on(self, power=0):
+        self.power = int(power)
+        self.motor.throttle = self.power * 0.01
         self.state = True
         await self.cbpi.actor.actor_update(self.id,self.power)
 
