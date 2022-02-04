@@ -32,7 +32,7 @@ class i2cPWMActor(CBPiActor):
         self.elementNumber = int(self.props.get("elementNumber", 1))
         self.state = False
 
-    async def on(self, power=0):
+    async def on(self, power=100):
         self.power = int(power)
         if self.elementNumber == 1:
             kit.motor1.throttle = self.power * 0.01
