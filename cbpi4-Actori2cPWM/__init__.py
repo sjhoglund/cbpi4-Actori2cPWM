@@ -27,13 +27,30 @@ kit = MotorKit(i2c=board.I2C())
 ])
 class i2cPWMActor(CBPiActor):
     
+    # Custom property which can be configured by the user
+    @action("Set Power", parameters=[Property.Number(label="Power", configurable=True,description="Power Setting [0-100]")])
+    async def setpower(self,Power = 100 ,**kwargs):
+        self.power=int(Power)
+        if self.power < 0:
+            self.power = 0
+        if self.power > 100:
+            self.power = 100
+        await self.set_power(self.power)
+        
+    async def set_power(self, power):      
+        await self.cbpi.actor.actor_update(self.id,self.power)
+        pass
+    
     def __init__(self, cbpi, id, props):
         super(i2cPWMActor, self).__init__(cbpi, id, props)
         self.elementNumber = int(self.props.get("elementNumber", 1))
         self.state = False
 
-    async def on(self, power=100):
-        self.power = int(power)
+    async def on(self, power=None):
+        
+        if power is not None:
+            self.power = int(power)
+        
         if self.elementNumber == 1:
             kit.motor1.throttle = self.power * 0.01
         elif self.elementNumber == 2:
@@ -43,6 +60,7 @@ class i2cPWMActor(CBPiActor):
         elif self.elementNumber == 4:
             kit.motor4.throttle = self.power * 0.01
         self.state = True
+        await self.cbpi.actor.actor_update(self.id,self.power)
 
     async def off(self):
         if self.elementNumber == 1:
