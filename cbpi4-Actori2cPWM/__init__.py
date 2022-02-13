@@ -38,8 +38,7 @@ class i2cPWMActor(CBPiActor):
         await self.set_power(self.power)
         
     async def set_power(self, power):      
-        await self.cbpi.actor.actor_update(self.id,self.power)
-        pass
+        await self.on(power)
     
     def __init__(self, cbpi, id, props):
         super(i2cPWMActor, self).__init__(cbpi, id, props)
@@ -78,7 +77,8 @@ class i2cPWMActor(CBPiActor):
         return self.state
     
     async def run(self):
-        pass
+        while self.running == True:
+            await asyncio.sleep(1)
 
 
 def setup(cbpi):
